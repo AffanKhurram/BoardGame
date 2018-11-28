@@ -4,6 +4,8 @@ var keys = [];
 var rollDice = false;
 var timer = 0;
 var currentNum = 1;
+var moveNum = 0;
+var rolled = false;
 
 function setup () {
     var cnv = createCanvas(600, 600);
@@ -17,9 +19,10 @@ function setup () {
 
 function draw () {
     board.draw();
+    var moved = false;
     for (var i = 0; i < players.length; i++) {
         players[i].draw();
-        players[i].move();
+        moved = players[i].move();
     }
     // Roll the dice
     if (keys[82]) {
@@ -33,11 +36,25 @@ function draw () {
     textSize(15);
     text(currentNum, 295, 130);
     if (rollDice) {
+        rolled = true;
         timer--;
+        currentNum = Math.floor(random(1, 7));
         if (timer <= 0) {
             rollDice = false;
+            moveNum = currentNum;
         }
-        currentNum = Math.floor(random(1, 7));
+    }
+    if (moveNum > 0 && !moved) {
+        if (players[0].currentIndex !== 15 && board.spaces[players[0].currentIndex] !== null) {
+            console.log("test");
+        }
+        var index = players[0].currentIndex+1;
+        if (index >= 20) {
+            index -= 20;
+        }
+        this.players[0].targetSpace = {x: board.spaces[index].x+10, y: board.spaces[index].y+10};
+        moveNum--;
+        players[0].currentIndex = index;
     }
 }
 

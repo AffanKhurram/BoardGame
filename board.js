@@ -4,6 +4,8 @@ var numSpaces;
 var numVertical;
 var startX;
 var startY;
+var lastX;
+var lastYl
 
 function Board () {
     this.board = [
@@ -14,6 +16,14 @@ function Board () {
         [1, 0, 0, 0, 0, 1],
         [1, 1, 2, 1, 1, 3]
     ];
+    this.vals = [
+        [1,2,3,4,5,6],
+        [20,0,0,0,0,7],
+        [19,0,0,0,0,8],
+        [18,0,0,0,0,9],
+        [17,0,0,0,0,10],
+        [16,15,14,13,12,11],
+    ];
     numSpaces = this.board[0].length;
     numVertical = this.board.length;
     this.spaceRadius = 25;
@@ -21,7 +31,7 @@ function Board () {
     this.verticalDist = (height-(numVertical*this.spaceRadius*2 + 2*verticalConst)) / (numVertical-1);
     this.spaceApartx = this.horizontalDist+2*this.spaceRadius;
     this.spaceAparty = this.verticalDist+2*this.spaceRadius;
-
+    
     // Populate the spaces array
     this.spaces = [];
     // Adds from the boards 2d array
@@ -30,25 +40,44 @@ function Board () {
             var x = horizontalConst+this.spaceApartx*j;
             var y = verticalConst+this.spaceAparty*i;
             if (this.board[i][j] === 1) {
-                this.spaces.push(new Space(x, y, this.spaceRadius, 'good'));
+                this.spaces.push(new Space(x, y, this.spaceRadius, 'good', this.vals[i][j]));
             } else if (this.board[i][j] === 2) {
-                this.spaces.push(new Space(x, y, this.spaceRadius, 'bad'));
+                this.spaces.push(new Space(x, y, this.spaceRadius, 'bad', this.vals[i][j]));
             }
             else if (this.board[i][j] === 3) {
-                this.spaces.push(new Space(x, y, this.spaceRadius, 'shop'));
+                this.spaces.push(new Space(x, y, this.spaceRadius, 'shop', this.vals[i][j]));
             }
+        }
+    }
+    
+    lastX = this.spaces[this.spaces.length-1].x-3;
+    lastY = this.spaces[this.spaces.length-1].y-2;
+
+    this.spaces.sort(function(x, y) { return x.val-y.val; });
+    for (var i = 0; i < this.spaces.length; i++) {
+        if (i !== this.spaces.length-1) {
+            this.spaces[i].next = this.spaces[i+1];
+        } else {
+            this.spaces[i].next = this.spaces[0];
         }
     }
     // Add some custom spaces that will make an X
     // Looks weird if doing with normal spacing
-    this.spaces.splice(0, 0, new Space(275, 270, this.spaceRadius, 'shop'));
-    this.spaces.splice(0, 0, new Space(150, 395, this.spaceRadius, 'bad'));
-    this.spaces.splice(0, 0, new Space(400, 395, this.spaceRadius, 'good'));
-    this.spaces.splice(0, 0, new Space(400, 145, this.spaceRadius, 'good'));
-    this.spaces.splice(0, 0, new Space(150, 150, this.spaceRadius, 'good'));
+    var shop = new Space(275, 270, this.spaceRadius, 'shop');
+    this.spaces.push(shop);
+    this.spaces.push(new Space(150, 395, this.spaceRadius, 'bad'));
+    this.spaces.push(new Space(400, 395, this.spaceRadius, 'good'));
+    this.spaces.push(new Space(400, 145, this.spaceRadius, 'good'));
+    this.spaces.push(new Space(150, 150, this.spaceRadius, 'good'));
 
+    // Link the edges to the diagonal
+    this.spaces[15].diagonal = this.spaces[21];
+    this.spaces[0].diagonal = this.spaces[24];
+    this.spaces[5].diagonal = this.spaces[23];
+    this.spaces[10].diagonal = this.spaces[22];
     startX = horizontalConst;
     startY = verticalConst+this.spaceAparty*(numVertical-1);
+
 }
 
 
@@ -59,9 +88,9 @@ Board.prototype.draw = function () {
     noStroke();
     // The horizontal rectangles
     rect(horizontalConst-3, verticalConst-3, 2*this.spaceRadius+5, height - 2*verticalConst+3);
-    rect(this.spaces[this.spaces.length-1].x-3, verticalConst-3, 2*this.spaceRadius+5, height - 2*verticalConst+3);
+    rect(lastX, verticalConst-3, 2*this.spaceRadius+5, height - 2*verticalConst+3);
     rect(horizontalConst-3, verticalConst-3, width - 2*horizontalConst+3, 2*this.spaceRadius+5);
-    rect(horizontalConst-3, this.spaces[this.spaces.length-1].y-2, width - 2*horizontalConst+5, 2*this.spaceRadius+5);
+    rect(horizontalConst-3, lastY, width - 2*horizontalConst+5, 2*this.spaceRadius+5);
     // Rotated ones
     push();
     translate(horizontalConst+this.spaceApartx*(numSpaces-1), verticalConst);
@@ -83,10 +112,11 @@ Board.prototype.draw = function () {
     text('Start', startX+10, startY+30);
 }
 
-function Space (x, y, radius, type) {
+function Space (x, y, radius, type, val) {
     this.x = x;
     this.y = y;
     this.radius = radius;
+    this.val = val;
     if (type === 'good') {
         this.color = color(0, 255, 0);
         this.onLand = function() {}
@@ -97,6 +127,8 @@ function Space (x, y, radius, type) {
         this.color = color(255, 0, 255);
         this.onLand = function() {}
     }
+    this.next = null;
+    this.diagonal = null;
 }
 
 Space.prototype.draw = function () {
@@ -118,6 +150,7 @@ var Player = function (number) {
     this.number = number;
     this.x = startX+10;
     this.y = startY+10;
+    this.currentIndex = 15;
     this.color = color(0, 0, 255);
     this.targetSpace = {x:this.x, y:this.y};
 }
@@ -125,8 +158,8 @@ var Player = function (number) {
 Player.prototype.move = function () {
     var moveX = this.targetSpace.x - this.x;
     var moveY = this.targetSpace.y - this.y;
-    if (moveX === 0 && moveY === 0) {
-        return;
+    if ((moveX === 0 && moveY === 0) || (abs(moveX) < 5 && abs(moveY) < 5)) {
+        return false;
     }
 
     if (Math.abs(moveX) < 5) {
@@ -142,6 +175,7 @@ Player.prototype.move = function () {
     if (moveY !== 0) {
         this.y += 5*Math.sign(moveY);
     }
+    return true;
 }
 
 Player.prototype.draw = function () {
