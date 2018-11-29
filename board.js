@@ -153,6 +153,7 @@ var Player = function (number) {
     this.currentIndex = 15;
     this.color = color(0, 0, 255);
     this.targetSpace = {x:this.x, y:this.y};
+    this.onDiagonal = false;
 }
 
 Player.prototype.move = function () {

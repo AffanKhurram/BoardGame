@@ -6,6 +6,7 @@ var timer = 0;
 var currentNum = 1;
 var moveNum = 0;
 var rolled = false;
+var canClick = false;
 
 function setup () {
     var cnv = createCanvas(600, 600);
@@ -44,25 +45,42 @@ function draw () {
             moveNum = currentNum;
         }
     }
-    if (moveNum > 0 && !moved) {
-        if (players[0].currentIndex !== 15 && board.spaces[players[0].currentIndex] !== null) {
-            console.log("test");
+    if (moveNum > 0 && !moved && !canClick) {
+        if (players[0].diagonal) {
+            
         }
-        var index = players[0].currentIndex+1;
-        if (index >= 20) {
-            index -= 20;
+        if (board.spaces[players[0].currentIndex].diagonal !== null) {
+            canClick = true;
+        } else {
+            var index = players[0].currentIndex+1;
+            if (index >= 20) {
+                index -= 20;
+            }
+            this.players[0].targetSpace = {x: board.spaces[index].x+10, y: board.spaces[index].y+10};
+            moveNum--;
+            players[0].currentIndex = index;
         }
-        this.players[0].targetSpace = {x: board.spaces[index].x+10, y: board.spaces[index].y+10};
-        moveNum--;
-        players[0].currentIndex = index;
     }
 }
 
 mouseClicked = function () {
-    for (var i = 0; i < board.spaces.length; i++) {
-        if (board.spaces[i].isInMouse(mouseX, mouseY)) {
-            // For now move that one player
-            players[0].targetSpace = {x: board.spaces[i].x+10, y: board.spaces[i].y+10};
+    if (canClick) {
+        if (board.spaces[players[0].currentIndex].diagonal.isInMouse(mouseX, mouseY) || board.spaces[players[0].currentIndex].next.isInMouse(mouseX, mouseY)) {
+            canClick = false;
+            if (board.spaces[players[0].currentIndex].diagonal.isInMouse(mouseX, mouseY)) {
+                this.players[0].targetSpace = {x: board.spaces[players[0].currentIndex].diagonal.x, y: board.spaces[players[0].currentIndex].diagonal.y+10};
+                moveNum--;
+                players[0].currentIndex = index;
+                players[0].diagonal = true;
+            } else {
+                var index = players[0].currentIndex+1;
+                if (index >= 20) {
+                    index -= 20;
+                }
+                this.players[0].targetSpace = {x: board.spaces[index].x+10, y: board.spaces[index].y+10};
+                moveNum--;
+                players[0].currentIndex = index;
+            }
         }
     }
     // If the dice is clicked
