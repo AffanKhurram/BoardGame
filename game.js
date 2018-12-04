@@ -7,6 +7,19 @@ var currentNum = 1;
 var moveNum = 0;
 var rolled = false;
 var canClick = false;
+var turn = 0;
+var scene = 'menu';
+
+var testButton = {
+    x: 10,
+    y: 10,
+    width: 100,
+    heightL: 50,
+    label: "For test",
+    textSize: 20,
+    onClick: function () { alert("test"); }
+};
+var btn;
 
 function setup () {
     var cnv = createCanvas(600, 600);
@@ -15,10 +28,19 @@ function setup () {
     cnv.position(x, y);
     frameRate(30);
     board = new Board();
-    players.push(new Player(1));
+    for (var i =0 ; i < 3; i++)
+        players.push(new Player(i+1));
+
 }
 
-function draw () {
+function menu () {
+    
+}
+
+function game () {
+    noStroke();
+    fill(255);
+    rect(0, 0, width, height);
     board.draw();
     var moved = false;
     for (var i = 0; i < players.length; i++) {
@@ -36,7 +58,8 @@ function draw () {
     fill(0);
     textSize(15);
     text(currentNum, 295, 130);
-    if (rollDice) {
+
+    if (rollDice && moveNum === 0) {
         rolled = true;
         timer--;
         currentNum = Math.floor(random(1, 7));
@@ -45,41 +68,78 @@ function draw () {
             moveNum = currentNum;
         }
     }
+    console.log(turn);
     if (moveNum > 0 && !moved && !canClick) {
-        if (players[0].diagonal) {
-            
+        if (players[turn].diagonal) {
+            var index = players[turn].path[0];
+            players[turn].path.splice(0, 1);
+            players[turn].currentIndex = index;
+            if (players[turn].path.length === 0) {
+                players[turn].diagonal = false;
+            }
+            players[turn].targetSpace = {x: board.spaces[index].x+15, y: board.spaces[index].y+15};
+            moveNum--;
+            if (moveNum === 0) {
+                turn++;
+                turn %= this.players.length;
+            }
         }
-        if (board.spaces[players[0].currentIndex].diagonal !== null) {
+        else if (board.spaces[players[turn].currentIndex].diagonal !== null) {
             canClick = true;
         } else {
-            var index = players[0].currentIndex+1;
+            var index = players[turn].currentIndex+1;
             if (index >= 20) {
                 index -= 20;
             }
-            this.players[0].targetSpace = {x: board.spaces[index].x+10, y: board.spaces[index].y+10};
+            this.players[turn].targetSpace = {x: board.spaces[index].x+10, y: board.spaces[index].y+10};
             moveNum--;
-            players[0].currentIndex = index;
+            players[turn].currentIndex = index;
+            if (moveNum === 0) {
+                turn++;
+                turn %= this.players.length;
+            }
         }
+    }
+    
+}
+
+function draw () {
+    if (scene === "menu") {
+        menu();
+    } else if (scene === "game") {
+        game();
     }
 }
 
 mouseClicked = function () {
-    if (canClick) {
-        if (board.spaces[players[0].currentIndex].diagonal.isInMouse(mouseX, mouseY) || board.spaces[players[0].currentIndex].next.isInMouse(mouseX, mouseY)) {
+    if (scene === "menu") {
+        
+    } else if (canClick) {
+        if (board.spaces[players[turn].currentIndex].diagonal.isInMouse(mouseX, mouseY) || board.spaces[players[turn].currentIndex].next.isInMouse(mouseX, mouseY)) {
             canClick = false;
-            if (board.spaces[players[0].currentIndex].diagonal.isInMouse(mouseX, mouseY)) {
-                this.players[0].targetSpace = {x: board.spaces[players[0].currentIndex].diagonal.x, y: board.spaces[players[0].currentIndex].diagonal.y+10};
+            if (board.spaces[players[turn].currentIndex].diagonal.isInMouse(mouseX, mouseY)) {
+                this.players[turn].targetSpace = {x: board.spaces[players[turn].currentIndex].diagonal.x, y: board.spaces[players[turn].currentIndex].diagonal.y+10};
                 moveNum--;
-                players[0].currentIndex = index;
-                players[0].diagonal = true;
+                if (players[turn].currentIndex === 15) {
+                    players[turn].path = [21, 20, 23, 5];
+                } else if (players[turn].currentIndex === 0) {
+                    players[turn].path = [24, 20, 22, 10];
+                } else if (players[turn].currentIndex === 5) {
+                    players[turn].path = [23, 20, 21, 15];
+                } else if (players[turn].currentIndex === 10) {
+                    players[turn].path = [22, 20, 24, 0];
+                }
+                players[turn].currentIndex = players[turn].path[0];
+                players[turn].path.splice(0, 1);
+                players[turn].diagonal = true;
             } else {
-                var index = players[0].currentIndex+1;
+                var index = players[turn].currentIndex+1;
                 if (index >= 20) {
                     index -= 20;
                 }
-                this.players[0].targetSpace = {x: board.spaces[index].x+10, y: board.spaces[index].y+10};
+                this.players[turn].targetSpace = {x: board.spaces[index].x+10, y: board.spaces[index].y+10};
                 moveNum--;
-                players[0].currentIndex = index;
+                players[turn].currentIndex = index;
             }
         }
     }

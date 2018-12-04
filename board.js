@@ -151,15 +151,23 @@ var Player = function (number) {
     this.x = startX+10;
     this.y = startY+10;
     this.currentIndex = 15;
-    this.color = color(0, 0, 255);
+    if (number === 1)
+        this.color = color(0, 0, 255);
+    else if (number === 2)
+        this.color = color(100, 100, 255);
+    else if (number === 3) 
+        this.color = color(50, 50, 255);
     this.targetSpace = {x:this.x, y:this.y};
     this.onDiagonal = false;
+    this.path = [];
+    this.points = 0;
+    this.pieces = [];
 }
 
 Player.prototype.move = function () {
     var moveX = this.targetSpace.x - this.x;
     var moveY = this.targetSpace.y - this.y;
-    if ((moveX === 0 && moveY === 0) || (abs(moveX) < 5 && abs(moveY) < 5)) {
+    if ((moveX === 0 && moveY === 0) || (abs(moveX) < 7 && abs(moveY) < 7)) {
         return false;
     }
 
