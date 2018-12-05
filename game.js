@@ -10,16 +10,14 @@ var canClick = false;
 var turn = 0;
 var scene = 'menu';
 
-var testButton = {
-    x: 10,
-    y: 10,
-    width: 100,
-    heightL: 50,
-    label: "For test",
+var buttonObjects = [{
+    x: 250,
+    y: 100,
+    label: "play",
     textSize: 20,
-    onClick: function () { alert("test"); }
-};
-var btn;
+    onClick: function () { scene = "game"; }
+}];
+var buttons = [];
 
 function setup () {
     var cnv = createCanvas(600, 600);
@@ -30,11 +28,15 @@ function setup () {
     board = new Board();
     for (var i =0 ; i < 3; i++)
         players.push(new Player(i+1));
-
+    for (var i = 0; i < buttonObjects.length; i++) {
+        buttons.push(new Button(buttonObjects[i]));
+    }
 }
 
 function menu () {
-    
+    for (var i=0; i<buttons.length; i++) {
+        buttons[i].draw();
+    }
 }
 
 function game () {
@@ -56,6 +58,7 @@ function game () {
     fill(255);
     rect(275, 100, 50, 50);
     fill(0);
+    textAlign(LEFT, CENTER);
     textSize(15);
     text(currentNum, 295, 130);
 
@@ -113,7 +116,9 @@ function draw () {
 
 mouseClicked = function () {
     if (scene === "menu") {
-        
+        for (var i=0; i<buttons.length; i++) {
+            buttons[i].handleClick();
+        }
     } else if (canClick) {
         if (board.spaces[players[turn].currentIndex].diagonal.isInMouse(mouseX, mouseY) || board.spaces[players[turn].currentIndex].next.isInMouse(mouseX, mouseY)) {
             canClick = false;
@@ -143,15 +148,21 @@ mouseClicked = function () {
             }
         }
     }
-    // If the dice is clicked
-    if (mouseX >= 275 && mouseX <= 325 && mouseY >= 100 && mouseY <= 150) {
-        keys[82] = true;
-    }
 }
 mouseReleased = function () {
-    if (mouseX >= 275 && mouseX <= 325 && mouseY >= 100 && mouseY <= 150) {
-        keys[82] = false;
+    
+}
+
+mouseMoved = function () {
+    if (scene === "menu") {
+        for (var i = 0; i < buttons.length; i++) {
+            if (buttons[i].checkMouseIn()){
+                cursor(HAND);
+                return;
+            }
+        }
     }
+    cursor(ARROW);
 }
 
 keyPressed = function () {

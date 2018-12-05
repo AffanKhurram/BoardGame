@@ -109,6 +109,7 @@ Board.prototype.draw = function () {
     // Write the start text
     fill(0, 0, 0);
     textSize(14);
+    textAlign(LEFT, CENTER);
     text('Start', startX+10, startY+30);
 }
 
