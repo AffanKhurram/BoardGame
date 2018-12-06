@@ -158,6 +158,8 @@ var Player = function (number) {
         this.color = color(100, 100, 255);
     else if (number === 3) 
         this.color = color(50, 50, 255);
+    else if (number === 4)
+        this.color = color(100, 200, 100);
     this.targetSpace = {x:this.x, y:this.y};
     this.onDiagonal = false;
     this.path = [];
