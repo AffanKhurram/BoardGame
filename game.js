@@ -100,6 +100,11 @@ function game () {
     textSize(15);
     text(currentNum, 295, 130);
 
+    // Draw the points chart
+    noFill();
+    rect(70, 200, 95, 185);
+    
+
     if (rollDice && moveNum === 0) {
         rolled = true;
         timer--;
@@ -189,6 +194,10 @@ mouseClicked = function () {
                 players[turn].currentIndex = players[turn].path[0];
                 players[turn].path.splice(0, 1);
                 players[turn].diagonal = true;
+                if (moveNum === 0) {
+                    turn++;
+                    turn %= players.length;
+                }
             } else {
                 var index = players[turn].currentIndex+1;
                 if (index >= 20) {
@@ -197,6 +206,10 @@ mouseClicked = function () {
                 this.players[turn].targetSpace = {x: board.spaces[index].x+10, y: board.spaces[index].y+10};
                 moveNum--;
                 players[turn].currentIndex = index;
+                if (moveNum === 0) {
+                    turn++;
+                    turn %= players.length;
+                }
             }
         }
     }
