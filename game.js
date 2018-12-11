@@ -10,6 +10,7 @@ var canClick = false;
 var turn = 0;
 var scene = 'menu';
 var numPlayers = 0;
+var numRounds = 3;
 
 var buttonObjects = [{
     x: 250,
@@ -103,7 +104,14 @@ function game () {
     // Draw the points chart
     noFill();
     rect(70, 200, 95, 185);
-    
+    stroke(0);
+    text("Points", 95, 210);
+    for (var i=0; i<players.length; i++) {
+        text("P"+(i+1)+": " + players[i].points, 80, 240+30*i);
+    }
+
+    // Rounds text
+    text("Rounds Left: " + numRounds, 395, 260);
 
     if (rollDice && moveNum === 0) {
         rolled = true;
@@ -125,8 +133,12 @@ function game () {
             players[turn].targetSpace = {x: board.spaces[index].x+15, y: board.spaces[index].y+15};
             moveNum--;
             if (moveNum === 0) {
+                board.spaces[index].onLand(players[turn]);
                 turn++;
                 turn %= this.players.length;
+                if (turn === 0) {
+                    numRounds--;
+                }
             }
         }
         else if (board.spaces[players[turn].currentIndex].diagonal !== null) {
@@ -140,12 +152,22 @@ function game () {
             moveNum--;
             players[turn].currentIndex = index;
             if (moveNum === 0) {
+                board.spaces[index].onLand(players[turn]);
                 turn++;
                 turn %= this.players.length;
+                if (turn === 0) {
+                    numRounds--;
+                }
             }
         }
     }
-    
+    if (numRounds <= 0) {
+        scene = "endScene";
+    }
+}
+
+function endScene () {
+    alert("test");
 }
 
 function playersSelect () {
@@ -164,6 +186,8 @@ function draw () {
         game();
     } else if (scene === "players") {
         playersSelect();
+    } else if (scene === "endScene") {
+        endScene();
     }
 }
 
@@ -195,8 +219,12 @@ mouseClicked = function () {
                 players[turn].path.splice(0, 1);
                 players[turn].diagonal = true;
                 if (moveNum === 0) {
+                    board.spaces[players[turn].currentIndex].onLand(players[turn]);
                     turn++;
                     turn %= players.length;
+                    if (turn === 0) {
+                        numRounds--;
+                    }
                 }
             } else {
                 var index = players[turn].currentIndex+1;
@@ -207,8 +235,12 @@ mouseClicked = function () {
                 moveNum--;
                 players[turn].currentIndex = index;
                 if (moveNum === 0) {
+                    board.spaces[index].onLand(players[turn]);
                     turn++;
                     turn %= players.length;
+                    if (turn === 0) {
+                        numRounds--;
+                    }
                 }
             }
         }

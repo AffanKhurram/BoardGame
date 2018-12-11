@@ -120,10 +120,10 @@ function Space (x, y, radius, type, val) {
     this.val = val;
     if (type === 'good') {
         this.color = color(0, 255, 0);
-        this.onLand = function() {}
+        this.onLand = function(p) { p.points += 3; }
     } else if (type === 'bad') {
         this.color = color(255, 0, 0);
-        this.onLand = function() {}
+        this.onLand = function(p) { p.points -= 3; }
     } else if (type === 'shop') {
         this.color = color(255, 0, 255);
         this.onLand = function() {}
