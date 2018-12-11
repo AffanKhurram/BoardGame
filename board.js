@@ -118,6 +118,7 @@ function Space (x, y, radius, type, val) {
     this.y = y;
     this.radius = radius;
     this.val = val;
+    this.type = type;
     if (type === 'good') {
         this.color = color(0, 255, 0);
         this.onLand = function(p) { p.points += 3; }
@@ -126,7 +127,7 @@ function Space (x, y, radius, type, val) {
         this.onLand = function(p) { p.points -= 3; }
     } else if (type === 'shop') {
         this.color = color(255, 0, 255);
-        this.onLand = function() {}
+        this.onLand = teleport;
     }
     this.next = null;
     this.diagonal = null;

@@ -10,7 +10,9 @@ var canClick = false;
 var turn = 0;
 var scene = 'menu';
 var numPlayers = 0;
-var numRounds = 3;
+var numRounds = 100;
+var teleporting = false;
+var telIndex;
 
 var buttonObjects = [{
     x: 250,
@@ -113,7 +115,7 @@ function game () {
     // Rounds text
     text("Rounds Left: " + numRounds, 395, 260);
 
-    if (rollDice && moveNum === 0) {
+    if (rollDice && moveNum === 0 && !teleporting) {
         rolled = true;
         timer--;
         currentNum = Math.floor(random(1, 7));
@@ -133,6 +135,9 @@ function game () {
             players[turn].targetSpace = {x: board.spaces[index].x+15, y: board.spaces[index].y+15};
             moveNum--;
             if (moveNum === 0) {
+                if (board.spaces[index].type === "shop") {
+                    telIndex = turn;
+                }
                 board.spaces[index].onLand(players[turn]);
                 turn++;
                 turn %= this.players.length;
@@ -152,6 +157,9 @@ function game () {
             moveNum--;
             players[turn].currentIndex = index;
             if (moveNum === 0) {
+                if (board.spaces[index].type === "shop") {
+                    telIndex = turn;
+                }
                 board.spaces[index].onLand(players[turn]);
                 turn++;
                 turn %= this.players.length;
@@ -161,7 +169,7 @@ function game () {
             }
         }
     }
-    if (numRounds <= 0) {
+    if (numRounds <= 0 && !teleporting) {
         scene = "endScene";
     }
 }
@@ -219,6 +227,9 @@ mouseClicked = function () {
                 players[turn].path.splice(0, 1);
                 players[turn].diagonal = true;
                 if (moveNum === 0) {
+                    if (board.spaces[index].type === "shop") {
+                        telIndex = turn;
+                    }
                     board.spaces[players[turn].currentIndex].onLand(players[turn]);
                     turn++;
                     turn %= players.length;
@@ -235,6 +246,9 @@ mouseClicked = function () {
                 moveNum--;
                 players[turn].currentIndex = index;
                 if (moveNum === 0) {
+                    if (board.spaces[index].type === "shop") {
+                        telIndex = turn;
+                    }
                     board.spaces[index].onLand(players[turn]);
                     turn++;
                     turn %= players.length;
@@ -243,6 +257,21 @@ mouseClicked = function () {
                     }
                 }
             }
+        }
+    }
+    if (teleporting) {
+        for (var i=0; i<20; i++) {
+            if (board.spaces[i].isInMouse(mouseX, mouseY)) {
+                teleporting = false;
+                players[telIndex].currentIndex = i;
+                players[telIndex].x = board.spaces[i].x+10;
+                players[telIndex].y = board.spaces[i].y+10;
+                players[telIndex].targetSpace = {x: players[telIndex].x, y: players[telIndex].y};
+                if (players[telIndex].path.length) {
+                    players[telIndex].path = [];
+                    players[telIndex].diagonal = false;
+                }
+            } 
         }
     }
 }
@@ -276,4 +305,9 @@ keyPressed = function () {
 
 keyReleased = function () {
     keys[keyCode] = false;
+}
+
+function teleport () {
+    teleporting = true;
+    alert("Click on the square you want to move to on the edge of the board");
 }
