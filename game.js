@@ -13,6 +13,7 @@ var numPlayers = 0;
 var numRounds = 100;
 var teleporting = false;
 var telIndex;
+var doneMoving = false;
 
 var buttonObjects = [{
     x: 250,
@@ -124,7 +125,7 @@ function game () {
             moveNum = currentNum;
         }
     }
-    if (moveNum > 0 && !moved && !canClick) {
+    if (moveNum > 0 && !moved && !canClick && !doneMoving) {
         if (players[turn].diagonal) {
             var index = players[turn].path[0];
             players[turn].path.splice(0, 1);
@@ -137,6 +138,43 @@ function game () {
             if (moveNum === 0) {
                 if (board.spaces[index].type === "shop") {
                     telIndex = turn;
+                }
+                for (var k=0; k<players.length; k++) {
+                    if (k === turn) {
+                        continue;
+                    }
+                    if (players[turn].currentIndex === players[k].currentIndex) {
+                        console.log("test");
+                    }
+                }
+                for (var k=0; k<players.length; k++) {
+                    if (k === turn) {
+                        continue;
+                    }
+                    if (players[turn].currentIndex === players[k].currentIndex) {
+                        var n1 = prompt("Player " + (turn+1) + " enter a number (Hint try a number between 1 and 10)");
+                        var n2 = prompt("Player " + (k+1) + " enter a number (HInt try a number between one and ten)");
+                        if (n1 !== null && n2 !== null) {
+                            var randNum = Math.floor(Math.random() * 10)+1;
+                            var d1 = Math.abs(n1-randNum);
+                            var d2 = Math.abs(n2-randNum);
+                            if (d1 <= d2) {
+                                alert("Player " + (turn+1)  + " wins, the correct number was " + randNum);
+                                players.splice(k, 1);
+                                turn--;
+                                if (turn === -1) {
+                                    turn = players.length-1;
+                                }
+                            } else {
+                                alert("Player " + (k+1) + " wins, the correct number was " + randNum);
+                                players.splice(turn, 1);
+                                turn--;
+                                if (turn === -1) {
+                                    turn = players.length-1;
+                                }
+                            }
+                        }
+                    }
                 }
                 board.spaces[index].onLand(players[turn]);
                 turn++;
@@ -159,6 +197,35 @@ function game () {
             if (moveNum === 0) {
                 if (board.spaces[index].type === "shop") {
                     telIndex = turn;
+                }
+                for (var k=0; k<players.length; k++) {
+                    if (k === turn) {
+                        continue;
+                    }
+                    if (players[turn].currentIndex === players[k].currentIndex) {
+                        var n1 = prompt("Player " + (turn+1) + " enter a number (Hint try a number between 1 and 10)");
+                        var n2 = prompt("Player " + (k+1) + " enter a number (HInt try a number between one and ten)");
+                        if (n1 !== null && n2 !== null) {
+                            var randNum = Math.floor(Math.random() * 10)+1;
+                            var d1 = Math.abs(n1-randNum);
+                            var d2 = Math.abs(n2-randNum);
+                            if (d1 <= d2) {
+                                alert("Player " + (turn+1)  + " wins, the correct number was " + randNum);
+                                players.splice(k, 1);
+                                turn--;
+                                if (turn === -1) {
+                                    turn = players.length-1;
+                                }
+                            } else {
+                                alert("Player " + (k+1) + " wins, the correct number was " + randNum);
+                                players.splice(turn, 1);
+                                turn--;
+                                if (turn === -1) {
+                                    turn = players.length-1;
+                                }
+                            }
+                        }
+                    }
                 }
                 board.spaces[index].onLand(players[turn]);
                 turn++;
@@ -230,6 +297,35 @@ mouseClicked = function () {
                     if (board.spaces[index].type === "shop") {
                         telIndex = turn;
                     }
+                    for (var k=0; k<players.length; k++) {
+                        if (k === turn) {
+                            continue;
+                        }
+                        if (players[turn].currentIndex === players[k].currentIndex) {
+                            var n1 = prompt("Player " + (turn+1) + " enter a number (Hint try a number between 1 and 10)");
+                            var n2 = prompt("Player " + (k+1) + " enter a number (HInt try a number between one and ten)");
+                            if (n1 !== null && n2 !== null) {
+                                var randNum = Math.floor(Math.random() * 10)+1;
+                                var d1 = Math.abs(n1-randNum);
+                                var d2 = Math.abs(n2-randNum);
+                                if (d1 <= d2) {
+                                    alert("Player " + (turn+1)  + " wins, the correct number was " + randNum);
+                                    players.splice(k, 1);
+                                    turn--;
+                                    if (turn === -1) {
+                                        turn = players.length-1;
+                                    }
+                                } else {
+                                    alert("Player " + (k+1) + " wins, the correct number was " + randNum);
+                                    players.splice(turn, 1);
+                                    turn--;
+                                    if (turn === -1) {
+                                        turn = players.length-1;
+                                    }
+                                }
+                            }
+                        }
+                    }
                     board.spaces[players[turn].currentIndex].onLand(players[turn]);
                     turn++;
                     turn %= players.length;
@@ -248,6 +344,35 @@ mouseClicked = function () {
                 if (moveNum === 0) {
                     if (board.spaces[index].type === "shop") {
                         telIndex = turn;
+                    }
+                    for (var k=0; k<players.length; k++) {
+                        if (k === turn) {
+                            continue;
+                        }
+                        if (players[turn].currentIndex === players[k].currentIndex) {
+                            var n1 = prompt("Player " + (turn+1) + " enter a number (Hint try a number between 1 and 10)");
+                            var n2 = prompt("Player " + (k+1) + " enter a number (HInt try a number between one and ten)");
+                            if (n1 !== null && n2 !== null) {
+                                var randNum = Math.floor(Math.random() * 10)+1;
+                                var d1 = Math.abs(n1-randNum);
+                                var d2 = Math.abs(n2-randNum);
+                                if (d1 <= d2) {
+                                    alert("Player " + (turn+1) + " wins, the correct number was " + randNum);
+                                    players.splice(k, 1);
+                                    turn--;
+                                    if (turn === -1) {
+                                        turn = players.length-1;
+                                    }
+                                } else {
+                                    alert("Player " + (k+1) + " wins, the correct number was " + randNum);
+                                    players.splice(turn, 1);
+                                    turn--;
+                                    if (turn === -1) {
+                                        turn = players.length-1;
+                                    }
+                                }
+                            }
+                        }
                     }
                     board.spaces[index].onLand(players[turn]);
                     turn++;
