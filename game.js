@@ -160,14 +160,14 @@ function game () {
                             var d2 = Math.abs(n2-randNum);
                             if (d1 <= d2) {
                                 alert("Player " + (turn+1)  + " wins, the correct number was " + randNum);
-                                players.splice(k, 1);
+                                players.splice(turn, 1);
                                 turn--;
                                 if (turn === -1) {
                                     turn = players.length-1;
                                 }
                             } else {
                                 alert("Player " + (k+1) + " wins, the correct number was " + randNum);
-                                players.splice(turn, 1);
+                                players.splice(k, 1);
                                 turn--;
                                 if (turn === -1) {
                                     turn = players.length-1;
@@ -211,14 +211,14 @@ function game () {
                             var d2 = Math.abs(n2-randNum);
                             if (d1 <= d2) {
                                 alert("Player " + (turn+1)  + " wins, the correct number was " + randNum);
-                                players.splice(k, 1);
+                                players.splice(turn, 1);
                                 turn--;
                                 if (turn === -1) {
                                     turn = players.length-1;
                                 }
                             } else {
                                 alert("Player " + (k+1) + " wins, the correct number was " + randNum);
-                                players.splice(turn, 1);
+                                players.splice(k, 1);
                                 turn--;
                                 if (turn === -1) {
                                     turn = players.length-1;
@@ -310,14 +310,14 @@ mouseClicked = function () {
                                 var d2 = Math.abs(n2-randNum);
                                 if (d1 <= d2) {
                                     alert("Player " + (turn+1)  + " wins, the correct number was " + randNum);
-                                    players.splice(k, 1);
+                                    players.splice(turn, 1);
                                     turn--;
                                     if (turn === -1) {
                                         turn = players.length-1;
                                     }
                                 } else {
                                     alert("Player " + (k+1) + " wins, the correct number was " + randNum);
-                                    players.splice(turn, 1);
+                                    players.splice(k, 1);
                                     turn--;
                                     if (turn === -1) {
                                         turn = players.length-1;
@@ -358,14 +358,14 @@ mouseClicked = function () {
                                 var d2 = Math.abs(n2-randNum);
                                 if (d1 <= d2) {
                                     alert("Player " + (turn+1) + " wins, the correct number was " + randNum);
-                                    players.splice(k, 1);
+                                    players.splice(turn, 1);
                                     turn--;
                                     if (turn === -1) {
                                         turn = players.length-1;
                                     }
                                 } else {
                                     alert("Player " + (k+1) + " wins, the correct number was " + randNum);
-                                    players.splice(turn, 1);
+                                    players.splice(k, 1);
                                     turn--;
                                     if (turn === -1) {
                                         turn = players.length-1;
