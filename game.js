@@ -10,17 +10,27 @@ var canClick = false;
 var turn = 0;
 var scene = 'menu';
 var numPlayers = 0;
-var numRounds = 5;
+var numRounds = 3;
 var teleporting = false;
 var telIndex;
+var instIndex = 0;
 
-var buttonObjects = [{
-    x: 250,
-    y: 100,
-    label: "play",
-    textSize: 20,
-    onClick: function () { scene = "players"; }
-}];
+var buttonObjects = [
+    {
+        x: 250,
+        y: 100,
+        label: "Play",
+        textSize: 20,
+        onClick: function () { scene = "players"; }
+    },
+    {
+        x: 250,
+        y: 300,
+        label: "Instructions",
+        textSize: 18,
+        onClick: function () { scene = "instructions"; }
+    }
+];
 var buttons = [];
 
 var playersButtonObj = [
@@ -183,7 +193,10 @@ function endScene () {
             max = players[i].points;
         }
     }
-    alert(winner);
+    background(255);
+    fill(0);
+    textSize(50);
+    text("Player " + (winner+1) + " wins!!!!!!!", 100, 100);
 }
 
 function playersSelect () {
@@ -204,7 +217,53 @@ function draw () {
         playersSelect();
     } else if (scene === "endScene") {
         endScene();
+    } else if (scene === "instructions") {
+        instructions();
     }
+}
+
+function instructions () {
+    background(255);
+    if (instIndex === 0) {
+        text("Welcome to my game\nThe goal is simple, collect the most points before the game ends, and you will win", 250, 10);
+    } else if (instIndex === 1) {
+        board.draw();
+        text("Here is a picture of the board, all players\nwill start on the start space in the bottom left corner", 200, 100);
+    } else if (instIndex === 2) {
+        text("Press r to roll the dice", 100, 75);
+        fill(255);
+        rect(275, 50, 50, 50);
+        fill(0);
+        textAlign(LEFT, CENTER);
+        textSize(15);
+        text(currentNum, 295, 75);
+        text("You will move the number of spaces said on the dice", 100, 150);
+        text("If you land on this space, your points will increase by three", 100, 225);
+        fill(0, 255, 0);
+        ellipse(500, 200, 50, 50);
+        fill(0);
+        text("If you land on this space, your points will decrease by three", 100, 300);
+        fill(255, 0, 0);
+        ellipse(500, 275, 50, 50);
+        fill(0);
+        text("If you land on this space, you will be able to move to a space\non the edge", 100, 375);
+        fill(255, 0, 255);
+        ellipse(515, 350 , 50, 50);
+    } else if (instIndex === 3) {
+        text("The players will show up on the board in this order", 100, 50);
+        textSize(50);
+        text("1", 200, 200);
+        text("2", 400, 200);
+        text("3", 200, 400);
+        text("4", 400, 400);
+        textSize(20);
+    } else if (instIndex === 4) {
+        scene = "menu";
+        menu();
+        return;
+    }
+    fill(0);
+    text("(Click to continue)", 250, 500);
 }
 
 mouseClicked = function () {
@@ -212,6 +271,8 @@ mouseClicked = function () {
         for (var i=0; i<buttons.length; i++) {
             buttons[i].handleClick();
         }
+    } else if (scene === "instructions") {
+        instIndex++;
     } else if (scene === 'players') {
         for (var i = 0; i < playersButtons.length; i++) {
             playersButtons[i].handleClick();
