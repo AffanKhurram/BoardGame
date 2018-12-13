@@ -63,8 +63,7 @@ function Board () {
     }
     // Add some custom spaces that will make an X
     // Looks weird if doing with normal spacing
-    var shop = new Space(275, 270, this.spaceRadius, 'shop');
-    this.spaces.push(shop);
+    this.spaces.push(new Space(275, 270, this.spaceRadius, 'shop'));
     this.spaces.push(new Space(150, 395, this.spaceRadius, 'bad'));
     this.spaces.push(new Space(400, 395, this.spaceRadius, 'good'));
     this.spaces.push(new Space(400, 145, this.spaceRadius, 'good'));
@@ -150,17 +149,29 @@ Space.prototype.isInMouse = function (x, y) {
 
 var Player = function (number) {
     this.number = number;
-    this.x = startX+10;
-    this.y = startY+10;
     this.currentIndex = 15;
-    if (number === 1)
+    if (number === 1) {
         this.color = color(0, 0, 255);
-    else if (number === 2)
+        this.xConst = 10;
+        this.yConst = 10;
+    }
+    else if (number === 2){
         this.color = color(100, 100, 255);
-    else if (number === 3) 
-        this.color = color(50, 50, 255);
-    else if (number === 4)
+        this.xConst = 30;
+        this.yConst = 10;
+    }
+    else if (number === 3)  {
+        this.color = color(255, 0, 255);
+        this.xConst = 10;
+        this.yConst = 30;
+    }
+    else if (number === 4) {
         this.color = color(100, 200, 100);
+        this.xConst = 30;
+        this.yConst = 30;
+    }
+    this.x = startX+this.xConst;
+    this.y = startY+this.yConst;
     this.targetSpace = {x:this.x, y:this.y};
     this.onDiagonal = false;
     this.path = [];

@@ -10,10 +10,9 @@ var canClick = false;
 var turn = 0;
 var scene = 'menu';
 var numPlayers = 0;
-var numRounds = 100;
+var numRounds = 5;
 var teleporting = false;
 var telIndex;
-var doneMoving = false;
 
 var buttonObjects = [{
     x: 250,
@@ -125,7 +124,7 @@ function game () {
             moveNum = currentNum;
         }
     }
-    if (moveNum > 0 && !moved && !canClick && !doneMoving) {
+    if (moveNum > 0 && !moved && !canClick) {
         if (players[turn].diagonal) {
             var index = players[turn].path[0];
             players[turn].path.splice(0, 1);
@@ -133,48 +132,11 @@ function game () {
             if (players[turn].path.length === 0) {
                 players[turn].diagonal = false;
             }
-            players[turn].targetSpace = {x: board.spaces[index].x+15, y: board.spaces[index].y+15};
+            players[turn].targetSpace = {x: board.spaces[index].x+players[turn].xConst, y: board.spaces[index].y+players[turn].yConst};
             moveNum--;
             if (moveNum === 0) {
                 if (board.spaces[index].type === "shop") {
                     telIndex = turn;
-                }
-                for (var k=0; k<players.length; k++) {
-                    if (k === turn) {
-                        continue;
-                    }
-                    if (players[turn].currentIndex === players[k].currentIndex) {
-                        console.log("test");
-                    }
-                }
-                for (var k=0; k<players.length; k++) {
-                    if (k === turn) {
-                        continue;
-                    }
-                    if (players[turn].currentIndex === players[k].currentIndex) {
-                        var n1 = prompt("Player " + (turn+1) + " enter a number (Hint try a number between 1 and 10)");
-                        var n2 = prompt("Player " + (k+1) + " enter a number (HInt try a number between one and ten)");
-                        if (n1 !== null && n2 !== null) {
-                            var randNum = Math.floor(Math.random() * 10)+1;
-                            var d1 = Math.abs(n1-randNum);
-                            var d2 = Math.abs(n2-randNum);
-                            if (d1 <= d2) {
-                                alert("Player " + (turn+1)  + " wins, the correct number was " + randNum);
-                                players.splice(turn, 1);
-                                turn--;
-                                if (turn === -1) {
-                                    turn = players.length-1;
-                                }
-                            } else {
-                                alert("Player " + (k+1) + " wins, the correct number was " + randNum);
-                                players.splice(k, 1);
-                                turn--;
-                                if (turn === -1) {
-                                    turn = players.length-1;
-                                }
-                            }
-                        }
-                    }
                 }
                 board.spaces[index].onLand(players[turn]);
                 turn++;
@@ -191,41 +153,12 @@ function game () {
             if (index >= 20) {
                 index -= 20;
             }
-            this.players[turn].targetSpace = {x: board.spaces[index].x+10, y: board.spaces[index].y+10};
+            this.players[turn].targetSpace = {x: board.spaces[index].x+players[turn].xConst, y: board.spaces[index].y+players[turn].yConst};
             moveNum--;
             players[turn].currentIndex = index;
             if (moveNum === 0) {
                 if (board.spaces[index].type === "shop") {
                     telIndex = turn;
-                }
-                for (var k=0; k<players.length; k++) {
-                    if (k === turn) {
-                        continue;
-                    }
-                    if (players[turn].currentIndex === players[k].currentIndex) {
-                        var n1 = prompt("Player " + (turn+1) + " enter a number (Hint try a number between 1 and 10)");
-                        var n2 = prompt("Player " + (k+1) + " enter a number (HInt try a number between one and ten)");
-                        if (n1 !== null && n2 !== null) {
-                            var randNum = Math.floor(Math.random() * 10)+1;
-                            var d1 = Math.abs(n1-randNum);
-                            var d2 = Math.abs(n2-randNum);
-                            if (d1 <= d2) {
-                                alert("Player " + (turn+1)  + " wins, the correct number was " + randNum);
-                                players.splice(turn, 1);
-                                turn--;
-                                if (turn === -1) {
-                                    turn = players.length-1;
-                                }
-                            } else {
-                                alert("Player " + (k+1) + " wins, the correct number was " + randNum);
-                                players.splice(k, 1);
-                                turn--;
-                                if (turn === -1) {
-                                    turn = players.length-1;
-                                }
-                            }
-                        }
-                    }
                 }
                 board.spaces[index].onLand(players[turn]);
                 turn++;
@@ -242,7 +175,15 @@ function game () {
 }
 
 function endScene () {
-    alert("test");
+    var winner;
+    var max = -10000;
+    for (var i=0; i<players.length; i++) {
+        if (players[i].points > max) {
+            winner = i;
+            max = players[i].points;
+        }
+    }
+    alert(winner);
 }
 
 function playersSelect () {
@@ -279,7 +220,7 @@ mouseClicked = function () {
         if (board.spaces[players[turn].currentIndex].diagonal.isInMouse(mouseX, mouseY) || board.spaces[players[turn].currentIndex].next.isInMouse(mouseX, mouseY)) {
             canClick = false;
             if (board.spaces[players[turn].currentIndex].diagonal.isInMouse(mouseX, mouseY)) {
-                this.players[turn].targetSpace = {x: board.spaces[players[turn].currentIndex].diagonal.x, y: board.spaces[players[turn].currentIndex].diagonal.y+10};
+                this.players[turn].targetSpace = {x: board.spaces[players[turn].currentIndex].diagonal.x+players[turn].xConst, y: board.spaces[players[turn].currentIndex].diagonal.y+players[turn].yConst};
                 moveNum--;
                 if (players[turn].currentIndex === 15) {
                     players[turn].path = [21, 20, 23, 5];
@@ -293,38 +234,10 @@ mouseClicked = function () {
                 players[turn].currentIndex = players[turn].path[0];
                 players[turn].path.splice(0, 1);
                 players[turn].diagonal = true;
+                var index = players[turn].currentIndex;
                 if (moveNum === 0) {
                     if (board.spaces[index].type === "shop") {
                         telIndex = turn;
-                    }
-                    for (var k=0; k<players.length; k++) {
-                        if (k === turn) {
-                            continue;
-                        }
-                        if (players[turn].currentIndex === players[k].currentIndex) {
-                            var n1 = prompt("Player " + (turn+1) + " enter a number (Hint try a number between 1 and 10)");
-                            var n2 = prompt("Player " + (k+1) + " enter a number (HInt try a number between one and ten)");
-                            if (n1 !== null && n2 !== null) {
-                                var randNum = Math.floor(Math.random() * 10)+1;
-                                var d1 = Math.abs(n1-randNum);
-                                var d2 = Math.abs(n2-randNum);
-                                if (d1 <= d2) {
-                                    alert("Player " + (turn+1)  + " wins, the correct number was " + randNum);
-                                    players.splice(turn, 1);
-                                    turn--;
-                                    if (turn === -1) {
-                                        turn = players.length-1;
-                                    }
-                                } else {
-                                    alert("Player " + (k+1) + " wins, the correct number was " + randNum);
-                                    players.splice(k, 1);
-                                    turn--;
-                                    if (turn === -1) {
-                                        turn = players.length-1;
-                                    }
-                                }
-                            }
-                        }
                     }
                     board.spaces[players[turn].currentIndex].onLand(players[turn]);
                     turn++;
@@ -338,41 +251,12 @@ mouseClicked = function () {
                 if (index >= 20) {
                     index -= 20;
                 }
-                this.players[turn].targetSpace = {x: board.spaces[index].x+10, y: board.spaces[index].y+10};
+                this.players[turn].targetSpace = {x: board.spaces[index].x+players[turn].xConst, y: board.spaces[index].y+players[turn].yConst};
                 moveNum--;
                 players[turn].currentIndex = index;
                 if (moveNum === 0) {
                     if (board.spaces[index].type === "shop") {
                         telIndex = turn;
-                    }
-                    for (var k=0; k<players.length; k++) {
-                        if (k === turn) {
-                            continue;
-                        }
-                        if (players[turn].currentIndex === players[k].currentIndex) {
-                            var n1 = prompt("Player " + (turn+1) + " enter a number (Hint try a number between 1 and 10)");
-                            var n2 = prompt("Player " + (k+1) + " enter a number (HInt try a number between one and ten)");
-                            if (n1 !== null && n2 !== null) {
-                                var randNum = Math.floor(Math.random() * 10)+1;
-                                var d1 = Math.abs(n1-randNum);
-                                var d2 = Math.abs(n2-randNum);
-                                if (d1 <= d2) {
-                                    alert("Player " + (turn+1) + " wins, the correct number was " + randNum);
-                                    players.splice(turn, 1);
-                                    turn--;
-                                    if (turn === -1) {
-                                        turn = players.length-1;
-                                    }
-                                } else {
-                                    alert("Player " + (k+1) + " wins, the correct number was " + randNum);
-                                    players.splice(k, 1);
-                                    turn--;
-                                    if (turn === -1) {
-                                        turn = players.length-1;
-                                    }
-                                }
-                            }
-                        }
                     }
                     board.spaces[index].onLand(players[turn]);
                     turn++;
