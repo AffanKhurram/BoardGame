@@ -10,7 +10,7 @@ var canClick = false;
 var turn = 0;
 var scene = 'menu';
 var numPlayers = 0;
-var numRounds = 1;
+var numRounds = 10;
 var teleporting = false;
 var telIndex;
 var instIndex = 0;
@@ -103,7 +103,7 @@ function game () {
         moved = players[i].move();
     }
     // Roll the dice
-    if (keys[82]) {
+    if (keys[82] && numRounds > 0) {
         rollDice = true;
         timer = 30;
     }
@@ -127,7 +127,7 @@ function game () {
     // Rounds text
     text("Rounds Left: " + numRounds, 395, 260);
 
-    if (rollDice && moveNum === 0 && !teleporting) {
+    if (rollDice && moveNum === 0 && !teleporting && numRounds > 0) {
         rolled = true;
         timer--;
         currentNum = Math.floor(random(1, 7));
@@ -136,10 +136,10 @@ function game () {
             moveNum = currentNum;
         }
     }
-    if (moveNum === 0 && !teleporting && keys[81]) {
+    if (moveNum === 0 && !teleporting && keys[81] && numRounds > 0) {
         canMakeBad = true;
     }
-    if (moveNum > 0 && !moved && !canClick && !canMakeBad) {
+    if (moveNum > 0 && !moved && !canClick && !canMakeBad && numRounds > 0) {
         if (players[turn].diagonal) {
             var index = players[turn].path[0];
             players[turn].path.splice(0, 1);
