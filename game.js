@@ -10,10 +10,12 @@ var canClick = false;
 var turn = 0;
 var scene = 'menu';
 var numPlayers = 0;
-var numRounds = 3;
+var numRounds = 1;
 var teleporting = false;
 var telIndex;
 var instIndex = 0;
+var canMakeBad = false;
+var endSceneTimer = 70;
 
 var buttonObjects = [
     {
@@ -134,7 +136,10 @@ function game () {
             moveNum = currentNum;
         }
     }
-    if (moveNum > 0 && !moved && !canClick) {
+    if (moveNum === 0 && !teleporting && keys[81]) {
+        canMakeBad = true;
+    }
+    if (moveNum > 0 && !moved && !canClick && !canMakeBad) {
         if (players[turn].diagonal) {
             var index = players[turn].path[0];
             players[turn].path.splice(0, 1);
@@ -180,23 +185,30 @@ function game () {
         }
     }
     if (numRounds <= 0 && !teleporting) {
+        if (endSceneTimer > 0) {
+            endSceneTimer--;
+            return;
+        }
         scene = "endScene";
     }
 }
 
 function endScene () {
-    var winner;
-    var max = -10000;
-    for (var i=0; i<players.length; i++) {
-        if (players[i].points > max) {
-            winner = i;
-            max = players[i].points;
-        }
-    }
     background(255);
     fill(0);
-    textSize(50);
-    text("Player " + (winner+1) + " wins!!!!!!!", 100, 100);
+    textSize(25);
+    players.sort(function(a, b) { return b.points - a.points; });
+    if (players.length >1 && players[0].points === players[1].points) {
+        text("There was a tie between the following players", 10, 100);
+        var n = players[0].points;
+        for (var i=0; i<players.length; i++) {
+            if (n === players[i].points) {
+                text("Player " + players[i].number, 10, i*50+200);
+            }
+        }
+    } else {
+        text("Player " + (players[0].number) + " wins!!!!!!!", 100, 100);
+    }
 }
 
 function playersSelect () {
@@ -258,6 +270,10 @@ function instructions () {
         text("4", 400, 400);
         textSize(20);
     } else if (instIndex === 4) {
+        textSize(25);
+        text("You will move in a clockwise path around the board.\nIf you ever hit a space on the corner, you have the\noption to move through the diagonal or continue\non the edge", 10, 150);
+        text("You may also press 'q' to change any green space\ninto a red one. This will end up taking up your turn\nso keep that in mind.", 10, 300);
+    } else if (instIndex === 5) {
         scene = "menu";
         menu();
         return;
@@ -328,7 +344,19 @@ mouseClicked = function () {
                 }
             }
         }
-    }
+    } else if (canMakeBad) {
+        for (var i=0; i<board.spaces.length; i++) {
+            if (board.spaces[i].isInMouse(mouseX, mouseY) && board.spaces[i].type === "good") {
+                board.spaces[i] = new Space(board.spaces[i].x, board.spaces[i].y, board.spaces[i].radius, "bad", board.spaces[i].val);
+                turn++;
+                canMakeBad = false;
+                turn %= players.length;
+                if (turn === 0) {
+                    numRounds--;
+                }
+            }
+        }
+    } 
     if (teleporting) {
         for (var i=0; i<20; i++) {
             if (board.spaces[i].isInMouse(mouseX, mouseY)) {
